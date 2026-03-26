@@ -5,6 +5,10 @@ import { useFonts, Lexend_400Regular, Lexend_500Medium, Lexend_700Bold } from '@
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { AuthProvider } from '../src/hooks/use-auth';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { cssInterop } from 'nativewind';
+
+cssInterop(SafeAreaView, { className: 'style' });
 
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
