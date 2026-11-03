@@ -8,6 +8,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { actionsApi, logsApi, type ApiAction } from '../src/lib/api';
 import TimePicker from '../src/components/time-picker';
+import { pickedTimeToLoggedAt } from '../src/lib/time';
 
 export default function RegisterScreen() {
     const router = useRouter();
@@ -35,12 +36,9 @@ export default function RegisterScreen() {
         setLoading(true);
         setError('');
         try {
-            // Build ISO datetime using today's date + picked time
-            const today = new Date().toISOString().slice(0, 10);
-            const isoDateTime = `${today}T${loggedAt}:00`;
             await logsApi.create({
                 actionId: selectedActionId,
-                loggedAt: isoDateTime,
+                loggedAt: pickedTimeToLoggedAt(loggedAt),
                 note: note.trim() || undefined,
             });
             router.back();

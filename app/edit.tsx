@@ -8,6 +8,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { logsApi } from '../src/lib/api';
 import TimePicker from '../src/components/time-picker';
+import { editedTimeToLoggedAt } from '../src/lib/time';
 
 export default function EditScreen() {
     const router = useRouter();
@@ -15,6 +16,7 @@ export default function EditScreen() {
 
     const [note, setNote] = useState('');
     const [loggedAt, setLoggedAt] = useState('08:00');
+    const [originalLoggedAt, setOriginalLoggedAt] = useState<string | null>(null);
     const [actionName, setActionName] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -24,6 +26,7 @@ export default function EditScreen() {
         if (!logId) return;
         logsApi.get(logId).then(data => {
             setNote(data.log.note ?? '');
+            setOriginalLoggedAt(data.log.loggedAt);
             const d = new Date(data.log.loggedAt);
             const h = String(d.getHours()).padStart(2, '0');
             const m = String(d.getMinutes()).padStart(2, '0');
@@ -33,13 +36,17 @@ export default function EditScreen() {
     }, [logId]);
 
     const handleSave = async () => {
-        if (!logId) return;
+        if (!logId || !originalLoggedAt) return;
         setSaving(true);
         setError('');
         try {
-            const today = new Date().toISOString().slice(0, 10);
+            const newLoggedAt = editedTimeToLoggedAt(originalLoggedAt, loggedAt);
+            if (new Date(newLoggedAt) > new Date()) {
+                setError("The time can't be in the future");
+                return;
+            }
             await logsApi.update(logId, {
-                loggedAt: `${today}T${loggedAt}:00`,
+                loggedAt: newLoggedAt,
                 note: note.trim() || undefined,
             });
             router.back();

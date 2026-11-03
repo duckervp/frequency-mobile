@@ -6,7 +6,9 @@ Expo (SDK 54) iOS app for Frequency — a **secondary** client that mirrors the 
 
 - Dev (web preview, for Claude to check UI): `npx expo start --web` → http://localhost:8081
 - Dev (device): `npm start`, then scan the QR code with Expo Go on the iPhone
-- Verify: `npx tsc --noEmit` — must pass before any commit (no tests or linter yet)
+- Verify: `npx tsc --noEmit` and `npm test` — must pass before any commit (no linter yet)
+- `npm test` — Vitest unit tests for pure logic (`src/**/*.test.ts`), pinned to `TZ=Asia/Ho_Chi_Minh`. No React Native rendering and no UI e2e yet: `expo-secure-store` has no web implementation, so login fails in the web preview.
+- Build `loggedAt` only through `src/lib/time.ts` (mirror of web `src/lib/time.ts`); send ISO instants (`toISOString()`), never `<date>T<HH:MM>:00` strings.
 
 ## Layout
 
