@@ -16,12 +16,16 @@ function toDateStr(year: number, month: number, day: number) {
     return `${year}-${mm}-${dd}`;
 }
 
+function toLocalDateKey(d: Date) {
+    return toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
 function computeStreak(logsByDay: Map<string, number>): number {
     let streak = 0;
     const cursor = new Date();
     cursor.setHours(0, 0, 0, 0);
     while (true) {
-        const key = cursor.toISOString().slice(0, 10);
+        const key = toLocalDateKey(cursor);
         if (logsByDay.has(key) && logsByDay.get(key)! > 0) {
             streak++;
             cursor.setDate(cursor.getDate() - 1);
@@ -88,7 +92,7 @@ export default function CalendarScreen() {
     const currentStreak = useMemo(() => {
         const byDay = new Map<string, number>();
         monthLogs.forEach(entry => {
-            const key = entry.log.loggedAt.slice(0, 10);
+            const key = toLocalDateKey(new Date(entry.log.loggedAt));
             byDay.set(key, (byDay.get(key) ?? 0) + 1);
         });
         return computeStreak(byDay);
